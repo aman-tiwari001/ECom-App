@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { Dialog, Disclosure, Menu, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import {
@@ -10,55 +10,75 @@ import {
 } from '@heroicons/react/20/solid';
 import ProductList from '../product-list/ProductList';
 import Pagination from '../pagination/Pagination';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  fetchAllProductsAsync,
+  fetchAllProductsByFilterAsync,
+  selectAllProducts,
+} from '../product-list/productListSlice';
 
 const sortOptions = [
-  { name: 'Most Popular', href: '#', current: true },
-  { name: 'Best Rating', href: '#', current: false },
-  { name: 'Newest', href: '#', current: false },
-  { name: 'Price: Low to High', href: '#', current: false },
-  { name: 'Price: High to Low', href: '#', current: false },
+  { name: 'Best Rating', sort: 'rating', current: false },
+  { name: 'Price: Low to High', sort: 'price', order: 'asc', current: false },
+  { name: 'Price: High to Low', sort: 'price', order: 'desc', current: false },
 ];
-const subCategories = [
-  { name: 'Totes', href: '#' },
-  { name: 'Backpacks', href: '#' },
-  { name: 'Travel Bags', href: '#' },
-  { name: 'Hip Bags', href: '#' },
-  { name: 'Laptop Sleeves', href: '#' },
-];
+
 const filters = [
   {
     id: 'color',
     name: 'Color',
     options: [
-      { value: 'white', label: 'White', checked: false },
-      { value: 'beige', label: 'Beige', checked: false },
-      { value: 'blue', label: 'Blue', checked: true },
-      { value: 'brown', label: 'Brown', checked: false },
-      { value: 'green', label: 'Green', checked: false },
-      { value: 'purple', label: 'Purple', checked: false },
+      { value: 'Black', label: 'Black', checked: false },
+      { value: 'Blue', label: 'Blue', checked: false },
+      { value: 'Gray', label: 'Gray', checked: false },
+      { value: 'White', label: 'White', checked: false },
+      { value: 'Brown', label: 'Brown', checked: false },
+      { value: 'Striped', label: 'Striped', checked: false },
     ],
   },
   {
-    id: 'category',
+    id: 'name',
     name: 'Category',
     options: [
-      { value: 'new-arrivals', label: 'New Arrivals', checked: false },
-      { value: 'sale', label: 'Sale', checked: false },
-      { value: 'travel', label: 'Travel', checked: true },
-      { value: 'organization', label: 'Organization', checked: false },
-      { value: 'accessories', label: 'Accessories', checked: false },
+      { value: 'Basic Tee', label: 'Basic Tee', checked: false },
+      { value: 'Casual Hoodie', label: 'Casual Hoodie', checked: false },
+      { value: 'Slim Fit Jeans', label: 'Slim Fit Jeans', checked: false },
+      { value: 'Graphic Tee', label: 'Graphic Tee', checked: false },
+      {
+        value: 'Athletic Shorts',
+        label: 'Athletic Shorts',
+        checked: false,
+      },
+      { value: 'Leather Jacket', label: 'Leather Jacket', checked: false },
+      {
+        value: 'Striped Polo Shirt',
+        label: 'Striped Polo Shirt',
+        checked: false,
+      },
     ],
   },
   {
     id: 'size',
     name: 'Size',
     options: [
-      { value: '2l', label: '2L', checked: false },
-      { value: '6l', label: '6L', checked: false },
-      { value: '12l', label: '12L', checked: false },
-      { value: '18l', label: '18L', checked: false },
-      { value: '20l', label: '20L', checked: false },
-      { value: '40l', label: '40L', checked: true },
+      { value: 'S', label: 'S', checked: false },
+      { value: 'XL', label: 'XL', checked: false },
+      { value: 'XXL', label: 'XXL', checked: false },
+      { value: 'M', label: 'M', checked: false },
+      { value: 'L', label: 'L', checked: false },
+    ],
+  },
+  {
+    id: 'price',
+    name: 'Price',
+    options: [
+      { value: 35, label: 35, checked: false },
+      { value: 30, label: 30, checked: false },
+      { value: 45, label: 45, checked: false },
+      { value: 50, label: 50, checked: false },
+      { value: 40, label: 40, checked: false },
+      { value: 25, label: 25, checked: false },
+      { value: 120, label: 120, checked: false },
     ],
   },
 ];
@@ -68,10 +88,39 @@ function classNames(...classes) {
 }
 
 export default function CategoryFilter() {
+  const dispatch = useDispatch();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [filterObj, setFilterObj] = useState({});
+
+  const handleFilter = (e, section, option) => {
+    // Creating filter object and dispactching it
+    let newFilter = { ...filterObj };
+    if (e.target.checked) {
+      newFilter[section.id] = option.value;
+    } else {
+      delete newFilter[section.id];
+    }
+    console.log('Filter Obj ', newFilter);
+    dispatch(fetchAllProductsByFilterAsync(newFilter));
+    setFilterObj(newFilter);
+  };
+
+  const handleSorting = (option) => {
+    console.log(option);
+    let newSort = { ...filterObj, _sort: option.sort, _order: option.order };
+    console.log('sort Obj ', newSort);
+    dispatch(fetchAllProductsByFilterAsync(newSort));
+    setFilterObj(newSort);
+  };
+
+  const products = useSelector(selectAllProducts);
+
+  useEffect(() => {
+    dispatch(fetchAllProductsAsync());
+  }, [dispatch]);
 
   return (
-    <div className="bg-white">
+    <div className="bg-white mt-7">
       <div>
         {/* Mobile filter dialog */}
         <Transition.Root show={mobileFiltersOpen} as={Fragment}>
@@ -162,6 +211,9 @@ export default function CategoryFilter() {
                                       defaultValue={option.value}
                                       type="checkbox"
                                       defaultChecked={option.checked}
+                                      onChange={(e) =>
+                                        handleFilter(e, section, option)
+                                      }
                                       className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                                     />
                                     <label
@@ -217,8 +269,7 @@ export default function CategoryFilter() {
                       {sortOptions.map((option) => (
                         <Menu.Item key={option.name}>
                           {({ active }) => (
-                            <a
-                              href={option.href}
+                            <label
                               className={classNames(
                                 option.current
                                   ? 'font-medium text-gray-900'
@@ -226,9 +277,10 @@ export default function CategoryFilter() {
                                 active ? 'bg-gray-100' : '',
                                 'block px-4 py-2 text-sm'
                               )}
+                              onClick={() => handleSorting(option)}
                             >
                               {option.name}
-                            </a>
+                            </label>
                           )}
                         </Menu.Item>
                       ))}
@@ -306,6 +358,10 @@ export default function CategoryFilter() {
                                   defaultValue={option.value}
                                   type="checkbox"
                                   defaultChecked={option.checked}
+                                  checked={option.checked}
+                                  onChange={(e) =>
+                                    handleFilter(e, section, option)
+                                  }
                                   className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                                 />
                                 <label
@@ -325,10 +381,12 @@ export default function CategoryFilter() {
               </form>
 
               {/* Product grid */}
-              <div className="lg:col-span-3">{<ProductList />}</div>
+              <div className="lg:col-span-3">
+                {<ProductList products={products} />}
+              </div>
             </div>
           </section>
-      <Pagination />
+          <Pagination totalProducts={products.length} />
         </main>
       </div>
     </div>
