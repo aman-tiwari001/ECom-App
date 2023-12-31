@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const getSingleProduct = (id) => {
-    const res = axios.get(`https://dummyjson.com/products/${id}`);
-    const r
-}
+export const getSingleProduct = async (id) => {
+  const res = await axios.get(`https://dummyjson.com/products/${id}`, {
+    headers: 'application/json',
+  });
+  return res.data;
+};

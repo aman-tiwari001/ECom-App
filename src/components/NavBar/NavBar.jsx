@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import {
   Bars3Icon,
@@ -6,6 +6,8 @@ import {
   XMarkIcon,
 } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
+import {useNavigate} from 'react-router-dom';
 
 const navigation = [
   { name: 'Home', href: '/', current: true },
@@ -19,8 +21,18 @@ function classNames(...classes) {
 }
 
 export default function NavBar() {
+  const navigate = useNavigate();
+  const [user, SetUser] = useState({});
+  useEffect(() => {
+    const token = localStorage.getItem('login_token');
+    if (token) {
+      const user = jwtDecode(token);
+      SetUser(user);
+    }
+  }, []);
+
   return (
-    <Disclosure as="nav" className="bg-gray-800 fixed top-0 w-[100%] z-10">
+    <Disclosure as="nav" className="bg-gray-800 fixed top-0 w-[100%] z-20">
       {({ open }) => (
         <>
           <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -44,7 +56,7 @@ export default function NavBar() {
                     src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
                     alt="E-Commerce App"
                   />
-                  <div className='text-white text-xl'>ECom App</div>
+                  <div className="text-white text-xl">ECom App</div>
                 </div>
                 <div className="hidden sm:ml-6 sm:block">
                   <div className="flex space-x-4">
@@ -66,7 +78,8 @@ export default function NavBar() {
                   </div>
                 </div>
               </div>
-              <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+              <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0 gap-2">
+                <p className="text-white text-md hidden md:block">Hi {user.firstName}!</p>
                 <Link to="/cart">
                   <button
                     type="button"
@@ -89,7 +102,7 @@ export default function NavBar() {
                       <span className="sr-only">Open user menu</span>
                       <img
                         className="h-8 w-8 rounded-full"
-                        src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                        src={user.image}
                         alt=""
                       />
                     </Menu.Button>
@@ -119,28 +132,15 @@ export default function NavBar() {
                       </Menu.Item>
                       <Menu.Item>
                         {({ active }) => (
-                          <a
-                            href="#"
+                          <span
+                            onClick={() => {localStorage.removeItem('login_token'); navigate('/login');}}
                             className={classNames(
-                              active ? 'bg-gray-100' : '',
-                              'block px-4 py-2 text-sm text-gray-700'
-                            )}
-                          >
-                            Settings
-                          </a>
-                        )}
-                      </Menu.Item>
-                      <Menu.Item>
-                        {({ active }) => (
-                          <a
-                            href="#"
-                            className={classNames(
-                              active ? 'bg-gray-100' : '',
+                              active ? 'bg-gray-100 cursor-pointer' : '',
                               'block px-4 py-2 text-sm text-gray-700'
                             )}
                           >
                             Sign out
-                          </a>
+                          </span>
                         )}
                       </Menu.Item>
                     </Menu.Items>

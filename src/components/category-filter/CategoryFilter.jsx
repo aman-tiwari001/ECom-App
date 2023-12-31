@@ -14,73 +14,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchAllProductsAsync,
   fetchAllProductsByFilterAsync,
-  selectAllProducts,
+  selectAllProducts
 } from '../product-list/productListSlice';
+import { getCategories } from './CategoryApi';
 
 const sortOptions = [
   { name: 'Best Rating', sort: 'rating', current: false },
   { name: 'Price: Low to High', sort: 'price', order: 'asc', current: false },
   { name: 'Price: High to Low', sort: 'price', order: 'desc', current: false },
-];
-
-const filters = [
-  {
-    id: 'color',
-    name: 'Color',
-    options: [
-      { value: 'Black', label: 'Black', checked: false },
-      { value: 'Blue', label: 'Blue', checked: false },
-      { value: 'Gray', label: 'Gray', checked: false },
-      { value: 'White', label: 'White', checked: false },
-      { value: 'Brown', label: 'Brown', checked: false },
-      { value: 'Striped', label: 'Striped', checked: false },
-    ],
-  },
-  {
-    id: 'name',
-    name: 'Category',
-    options: [
-      { value: 'Basic Tee', label: 'Basic Tee', checked: false },
-      { value: 'Casual Hoodie', label: 'Casual Hoodie', checked: false },
-      { value: 'Slim Fit Jeans', label: 'Slim Fit Jeans', checked: false },
-      { value: 'Graphic Tee', label: 'Graphic Tee', checked: false },
-      {
-        value: 'Athletic Shorts',
-        label: 'Athletic Shorts',
-        checked: false,
-      },
-      { value: 'Leather Jacket', label: 'Leather Jacket', checked: false },
-      {
-        value: 'Striped Polo Shirt',
-        label: 'Striped Polo Shirt',
-        checked: false,
-      },
-    ],
-  },
-  {
-    id: 'size',
-    name: 'Size',
-    options: [
-      { value: 'S', label: 'S', checked: false },
-      { value: 'XL', label: 'XL', checked: false },
-      { value: 'XXL', label: 'XXL', checked: false },
-      { value: 'M', label: 'M', checked: false },
-      { value: 'L', label: 'L', checked: false },
-    ],
-  },
-  {
-    id: 'price',
-    name: 'Price',
-    options: [
-      { value: 35, label: 35, checked: false },
-      { value: 30, label: 30, checked: false },
-      { value: 45, label: 45, checked: false },
-      { value: 50, label: 50, checked: false },
-      { value: 40, label: 40, checked: false },
-      { value: 25, label: 25, checked: false },
-      { value: 120, label: 120, checked: false },
-    ],
-  },
 ];
 
 function classNames(...classes) {
@@ -91,18 +32,49 @@ export default function CategoryFilter() {
   const dispatch = useDispatch();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [filterObj, setFilterObj] = useState({});
+  const [Categories, setCatgories] = useState([]);
+  const products = useSelector(selectAllProducts);
+  
+  const filters = [
+    {
+      id: 'name',
+      name: 'Category',
+      options: [
+        { value: '', label: 'ALL', checked: false },
+        ...Categories.map((item) => {
+          return {
+            value: item,
+            label: item.split('-').join(' ').toUpperCase(),
+            checked: false,
+          };
+        }),
+      ],
+    },
+  ];
+  const priceFilter = {
+    id: 'price',
+    name: 'Price',
+    options: [
+      { value: 100, label: 'Below $100', checked: false },
+      { value: 500, label: 'Below $500', checked: false },
+      { value: 1000, label: 'Below $1000', checked: false },
+      { value: 1500, label: 'Above $1500', checked: false },
+    ],
+  };
 
-  const handleFilter = (e, section, option) => {
-    // Creating filter object and dispactching it
-    let newFilter = { ...filterObj };
-    if (e.target.checked) {
-      newFilter[section.id] = option.value;
+  const handleFilter = (e) => {
+    if (e.target.value === '') {
+      // Displaying All categories
+      dispatch(fetchAllProductsAsync());
     } else {
-      delete newFilter[section.id];
+      // Getting filter and dispactching it
+      dispatch(fetchAllProductsByFilterAsync(e.target.value));
     }
-    console.log('Filter Obj ', newFilter);
-    dispatch(fetchAllProductsByFilterAsync(newFilter));
-    setFilterObj(newFilter);
+  };
+
+  const handlePriceFilter = (e) => {
+    // Getting price filter and dispactching it
+    dispatch(fetchAllProductsAsync(Number.parseInt(e.target.value)))
   };
 
   const handleSorting = (option) => {
@@ -113,14 +85,17 @@ export default function CategoryFilter() {
     setFilterObj(newSort);
   };
 
-  const products = useSelector(selectAllProducts);
 
   useEffect(() => {
-    dispatch(fetchAllProductsAsync());
+    const initialFetch = async () => {
+      setCatgories(await getCategories());
+      dispatch(fetchAllProductsAsync());
+    };
+    initialFetch();
   }, [dispatch]);
 
   return (
-    <div className="bg-white mt-7">
+    <div className="bg-white">
       <div>
         {/* Mobile filter dialog */}
         <Transition.Root show={mobileFiltersOpen} as={Fragment}>
@@ -356,9 +331,9 @@ export default function CategoryFilter() {
                                   id={`filter-${section.id}-${optionIdx}`}
                                   name={`${section.id}[]`}
                                   defaultValue={option.value}
-                                  type="checkbox"
-                                  defaultChecked={option.checked}
-                                  checked={option.checked}
+                                  type="radio"
+                                  // defaultChecked={option.checked}
+                                  // checked={option.checked}
                                   onChange={(e) =>
                                     handleFilter(e, section, option)
                                   }
@@ -378,6 +353,27 @@ export default function CategoryFilter() {
                     )}
                   </Disclosure>
                 ))}
+                <div className="space-y-4 mt-4">
+                  <h1>Price Filter</h1>
+                  {priceFilter.options.map((option, optionIdx) => (
+                    <div key={option.value} className="flex items-center">
+                      <input
+                        id={`filter-${priceFilter.id}-${optionIdx}`}
+                        name={`${priceFilter.id}`}
+                        defaultValue={option.value}
+                        type="radio"
+                        onChange={(e) => handlePriceFilter(e)}
+                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                      />
+                      <label
+                        htmlFor={`filter-${priceFilter.id}-${optionIdx}`}
+                        className="ml-3 text-sm text-gray-600"
+                      >
+                        {option.label}
+                      </label>
+                    </div>
+                  ))}
+                </div>
               </form>
 
               {/* Product grid */}
