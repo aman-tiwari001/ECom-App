@@ -13,13 +13,23 @@ const initialState = {
 export const fetchAllProductsAsync = createAsyncThunk(
   'product/fetchAllProducts',
   async (maxprice) => {
-    const response = await fetchAllProducts(maxprice);
-    if (maxprice === 1500) {
-      return response.products.filter((product) => product.price > maxprice);
+    const response = await fetchAllProducts();
+    if (maxprice === '1500') {
+      return {
+        ...response,
+        products: response.products.filter(
+          (product) => product.price > maxprice
+        ),
+      };
     } else if (maxprice) {
-      return response.products.filter((product) => product.price < maxprice);
+      return {
+        ...response,
+        products: response.products.filter(
+          (product) => product.price < maxprice
+        ),
+      };
     }
-    return response.products;
+    return response;
   }
 );
 
@@ -27,7 +37,7 @@ export const fetchAllProductsByFilterAsync = createAsyncThunk(
   'product/fetchAllProductsByFilter',
   async (filter) => {
     const response = await fetchAllProductsByFilter(filter);
-    return response.products;
+    return response;
   }
 );
 
@@ -35,7 +45,7 @@ export const fetchNewPageAsync = createAsyncThunk(
   'product/fetchNewPage',
   async (skip) => {
     const response = await fetchAllProducts(skip);
-    return response.products;
+    return response;
   }
 );
 
@@ -54,21 +64,24 @@ export const productListSlice = createSlice({
       })
       .addCase(fetchAllProductsAsync.fulfilled, (state, action) => {
         state.status = 'idle';
-        state.products = action.payload;
+        state.products = action.payload.products;
+        state.totalProducts = action.payload.total;
       })
       .addCase(fetchAllProductsByFilterAsync.pending, (state) => {
         state.status = 'loading';
       })
       .addCase(fetchAllProductsByFilterAsync.fulfilled, (state, action) => {
         state.status = 'idle';
-        state.products = action.payload;
+        state.products = action.payload.products;
+        state.totalProducts = action.payload.total;
       })
       .addCase(fetchNewPageAsync.pending, (state) => {
         state.status = 'loading';
       })
       .addCase(fetchNewPageAsync.fulfilled, (state, action) => {
         state.status = 'idle';
-        state.products = action.payload;
+        state.products = action.payload.products;
+        state.totalProducts = action.payload.total;
       });
   },
 });
@@ -77,5 +90,6 @@ export const productListSlice = createSlice({
 export const { increment } = productListSlice.actions;
 
 export const selectAllProducts = (state) => state.product.products;
+export const selectTotalProducts = (state) => state.product.totalProducts;
 
 export default productListSlice.reducer;

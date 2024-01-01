@@ -6,12 +6,6 @@ import Search from '../components/search/Search';
 
 const Home = () => {
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!localStorage.getItem('login_token')) {
-      navigate('/login');
-    }
-  }, []);
   return (
     <div>
       <NavBar />

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { loginUser } from './authApi';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useDispatch, useSelector } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 const Login = () => {
@@ -10,6 +10,8 @@ const Login = () => {
     username: '',
     password: '',
   });
+  const dispatch = useDispatch();
+  
   const handleUserLogin = async (event) => {
     event.preventDefault();
     console.log('cred', credentials);
@@ -17,7 +19,7 @@ const Login = () => {
       const loggedInUser = await loginUser(credentials);
       toast.success('User logged in!');
       localStorage.setItem('login_token', loggedInUser.data.token);
-      console.log('user', loggedInUser.data);
+
       navigate('/');
     } catch (err) {
       toast.error('Unable to log in!');

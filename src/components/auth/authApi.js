@@ -12,10 +12,3 @@ export const loginUser = async (credentials) => {
   );
   return userData;
 };
-
-// let { data } = await loginUser({
-//   username: 'kminchelle',
-//   password: '0lelplR',
-// });
-
-// console.log(data);

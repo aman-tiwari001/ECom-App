@@ -14,7 +14,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchAllProductsAsync,
   fetchAllProductsByFilterAsync,
-  selectAllProducts
+  selectAllProducts,
+  selectTotalProducts
 } from '../product-list/productListSlice';
 import { getCategories } from './CategoryApi';
 
@@ -34,6 +35,7 @@ export default function CategoryFilter() {
   const [filterObj, setFilterObj] = useState({});
   const [Categories, setCatgories] = useState([]);
   const products = useSelector(selectAllProducts);
+  const totalProducts = useSelector(selectTotalProducts);
   
   const filters = [
     {
@@ -74,7 +76,7 @@ export default function CategoryFilter() {
 
   const handlePriceFilter = (e) => {
     // Getting price filter and dispactching it
-    dispatch(fetchAllProductsAsync(Number.parseInt(e.target.value)))
+    dispatch(fetchAllProductsAsync(e.target.value))
   };
 
   const handleSorting = (option) => {
@@ -382,7 +384,7 @@ export default function CategoryFilter() {
               </div>
             </div>
           </section>
-          <Pagination totalProducts={products.length} />
+          <Pagination totalProducts={totalProducts} />
         </main>
       </div>
     </div>
