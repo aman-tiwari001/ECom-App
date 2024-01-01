@@ -1,50 +1,52 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { loginUser } from './authApi';
-import { useNavigate, useDispatch, useSelector } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
+import { fetchUser, loginUserAsync } from './authSlice';
 
-const Login = () => {
+const Login = ({ setProgress }) => {
   const navigate = useNavigate();
   const [credentials, setCredentials] = useState({
     username: '',
     password: '',
   });
   const dispatch = useDispatch();
-  
-  const handleUserLogin = async (event) => {
-    event.preventDefault();
-    console.log('cred', credentials);
-    try {
-      const loggedInUser = await loginUser(credentials);
-      toast.success('User logged in!');
-      localStorage.setItem('login_token', loggedInUser.data.token);
+  const user = useSelector(fetchUser);
 
-      navigate('/');
-    } catch (err) {
-      toast.error('Unable to log in!');
-      console.log(err);
-    }
+  const handleUserLogin = async () => {
+    setProgress(30);
+    await dispatch(loginUserAsync(credentials));
+    navigate('/');
   };
+  useEffect(() => {
+    setProgress(60);
+    if (user) {
+      localStorage.setItem('login_token', user.token);
+      toast.success("User logged in!")
+      setProgress(100);
+    }
+  }, [user]);
   return (
     <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+        <h1 className="text-white text-center text-3xl mb-3">ECom App</h1>
         <img
           className="mx-auto h-10 w-auto"
-          src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
+          src="/logo.png"
           alt="Your Company"
         />
-        <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+        <h2 className="text-white mt-6 text-center text-2xl font-bold leading-9 tracking-tight">
           Log in to your account
         </h2>
       </div>
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form className="space-y-6">
+        <div className="space-y-6">
           <div>
             <label
               htmlFor="email"
-              className="block text-sm font-medium leading-6 text-gray-900"
+              className="block text-sm font-medium leading-6 text-white"
             >
               Username
             </label>
@@ -55,7 +57,7 @@ const Login = () => {
                 type="text"
                 autoComplete="email"
                 required
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className="p-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 value={credentials.username}
                 onChange={(e) =>
                   setCredentials({ ...credentials, username: e.target.value })
@@ -68,7 +70,7 @@ const Login = () => {
             <div className="flex items-center justify-between">
               <label
                 htmlFor="password"
-                className="block text-sm font-medium leading-6 text-gray-900"
+                className="block text-sm font-medium leading-6 text-white"
               >
                 Password
               </label>
@@ -88,7 +90,7 @@ const Login = () => {
                 type="password"
                 autoComplete="current-password"
                 required
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className="p-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 value={credentials.password}
                 onChange={(e) =>
                   setCredentials({ ...credentials, password: e.target.value })
@@ -105,16 +107,13 @@ const Login = () => {
               Log In
             </button>
           </div>
-        </form>
+        </div>
 
         <p className="mt-10 text-center text-sm text-gray-500">
           Not a member?{' '}
-          <Link
-            to="/signup"
-            className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
-          >
+          <span className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
             Create a new account
-          </Link>
+          </span>
         </p>
       </div>
     </div>

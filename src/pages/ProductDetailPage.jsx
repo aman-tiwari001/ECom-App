@@ -2,11 +2,11 @@ import React from 'react';
 import NavBar from '../components/NavBar/NavBar';
 import ProductDetail from '../components/product-detail/ProductDetail';
 
-const ProductDetailPage = () => {
+const ProductDetailPage = ({setProgress}) => {
   return (
     <>
       <NavBar />
-      <ProductDetail />
+      <ProductDetail setProgress={setProgress} />
     </>
   );
 };

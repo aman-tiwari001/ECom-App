@@ -1,25 +1,40 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Home from './pages/Home';
 import LoginPage from './pages/LoginPage';
-import SignUpPage from './pages/SignUpPage';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import CartPage from './pages/CartPage';
-import CheckoutPage from './pages/CheckoutPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import ProtectedRoutes from './utils/ProtectedRoutes';
+import LoadingBar from 'react-top-loading-bar';
 
 function App() {
+  // state for top progress bar
+  const [progress, setProgress] = useState(0);
   return (
     <>
+      <LoadingBar
+        color="#4F46E5"
+        progress={progress}
+        shadow={true}
+        height={5}
+        onLoaderFinished={() => setProgress(0)}
+      />
       <Router>
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignUpPage />} />
-          <Route element={<ProtectedRoutes />}>
-            <Route path="/" element={<Home />} />
-            <Route path="/product-detail/:id" element={<ProductDetailPage />} />
-            <Route path="/cart" element={<CartPage />} />
-            <Route path="/checkout" element={<CheckoutPage />} />
+          <Route
+            path="/login"
+            element={<LoginPage setProgress={setProgress} />}
+          />
+          <Route element={<ProtectedRoutes setProgress={setProgress} />}>
+            <Route path="/" element={<Home setProgress={setProgress} />} />
+            <Route
+              path="/product-detail/:id"
+              element={<ProductDetailPage setProgress={setProgress} />}
+            />
+            <Route
+              path="/cart"
+              element={<CartPage setProgress={setProgress} />}
+            />
           </Route>
         </Routes>
       </Router>

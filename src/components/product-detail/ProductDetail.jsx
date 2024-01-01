@@ -10,7 +10,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
 
-export default function ProductDetail() {
+export default function ProductDetail({setProgress}) {
   const [product, setProduct] = useState(null);
   const [currImgIdx, setCurrentImgIdx] = useState(0);
 
@@ -30,9 +30,11 @@ export default function ProductDetail() {
   };
 
   useEffect(() => {
+    setProgress(40);
     const id = window.location.pathname.split('/')[2];
     const fetchProductDetails = async () => {
       setProduct(await getSingleProduct(id));
+      setProgress(100);
     };
     fetchProductDetails();
   }, []);
