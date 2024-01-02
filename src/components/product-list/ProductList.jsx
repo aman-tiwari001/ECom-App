@@ -1,9 +1,18 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { cartActions } from '../cart/cartSlice';
+import toast from 'react-hot-toast';
 
 const ProductList = ({ products }) => {
-
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const handleAddToCart = (product) => {
+    dispatch(cartActions.addToCart(product))
+    toast.success('Added to cart');
+    console.log('Added to cart');
+  };
 
   return (
     <div className="bg-white">
@@ -13,43 +22,39 @@ const ProductList = ({ products }) => {
             products.map((product) => (
               <div
                 key={product.id}
-                className="group relative  hover:transform transition-all duration-200 hover:scale-110"
+                className="group relative hover:transform transition-all duration-200 hover:scale-110 p-1"
               >
-                <div onClick={() => navigate(`/product-detail/${product.id}`)}>
-                  <div className="aspect-h-1 border-2 rounded-xl shadow-xl aspect-w-1 w-full overflow-hidden bg-gray-200 lg:aspect-none group group-hover:opacity-85 lg:h-80 ">
-                    <img
-                      src={product.images[0]}
-                      alt={product.title}
-                      className="h-full w-full object-cover object-center lg:h-full lg:w-full"
-                    />
-                  </div>
-                  <div className="mt-4 flex justify-between">
-                    <div>
-                      <h3 className="text-sm text-gray-700">
-                        <div>
-                          <span
-                            aria-hidden="true"
-                            className="absolute inset-0"
-                          />
-                          {product.title}
-                        </div>
-                      </h3>
-                    </div>
-                    <p className="text-sm font-medium text-gray-900">
-                      ${product.price}
-                    </p>
-                  </div>
+                <div
+                  id={`product-${product.id}`}
+                  onClick={() => navigate(`/product-detail/${product.id}`)}
+                  className="aspect-h-1 border-2 rounded-xl shadow-xl aspect-w-1 w-full overflow-hidden bg-gray-200 lg:aspect-none group group-hover:opacity-85 lg:h-64 "
+                >
+                  <img
+                    src={product.images[0]}
+                    alt={product.title}
+                    className="h-full w-full object-cover object-center lg:h-full lg:w-full"
+                  />
                 </div>
-                <div onClick={() => console.log('Added to cart')}>
-                  <button className="mt-2 bg-indigo-600 px-2 py-1 text-white rounded-xl hover:opacity-85">
-                    Add to Cart
-                  </button>
+                <div className="mt-4 flex justify-between items-center">
+                  <h3 className="text-sm text-gray-700">{product.title}</h3>
+
+                  <p className="text-md font-medium text-gray-900">
+                    ${product.price}
+                  </p>
                 </div>
+
+                <button
+                  id={`btn-add-to-cart-${product.title}`}
+                  onClick={() => handleAddToCart(product)}
+                  className="mt-2 cursor-pointer bg-indigo-600 px-2 py-1 text-white rounded-xl hover:opacity-85"
+                >
+                  Add to Cart
+                </button>
               </div>
             ))
           ) : (
-            <div className="text-xl row-span-4 col-span-4 text-center">
-              No products available for the applied filters!
+            <div className="flex items-center justify-center text-xl row-span-4 col-span-4 text-center">
+              <img src="/loader.gif" alt="spinner" />
             </div>
           )}
         </div>

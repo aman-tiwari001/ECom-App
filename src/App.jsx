@@ -6,6 +6,7 @@ import CartPage from './pages/CartPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import ProtectedRoutes from './utils/ProtectedRoutes';
 import LoadingBar from 'react-top-loading-bar';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   // state for top progress bar
@@ -19,6 +20,7 @@ function App() {
         height={5}
         onLoaderFinished={() => setProgress(0)}
       />
+      <Toaster position="top-center" reverseOrder={false} />
       <Router>
         <Routes>
           <Route

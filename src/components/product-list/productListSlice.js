@@ -52,11 +52,6 @@ export const fetchNewPageAsync = createAsyncThunk(
 export const productListSlice = createSlice({
   name: 'product',
   initialState,
-  reducers: {
-    increment: (state) => {
-      state.products += 1;
-    },
-  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchAllProductsAsync.pending, (state) => {
@@ -87,7 +82,6 @@ export const productListSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { increment } = productListSlice.actions;
 
 export const selectAllProducts = (state) => state.product.products;
 export const selectTotalProducts = (state) => state.product.totalProducts;

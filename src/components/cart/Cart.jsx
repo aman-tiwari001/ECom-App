@@ -1,38 +1,37 @@
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
-
-const products = [
-  {
-    id: 1,
-    name: 'Throwback Hip Bag',
-    href: '#',
-    color: 'Salmon',
-    price: '$90.00',
-    quantity: 1,
-    imageSrc:
-      'https://tailwindui.com/img/ecommerce-images/shopping-cart-page-04-product-01.jpg',
-    imageAlt:
-      'Salmon orange fabric pouch with match zipper, gray zipper pull, and adjustable hip belt.',
-  },
-  {
-    id: 2,
-    name: 'Medium Stuff Satchel',
-    href: '#',
-    color: 'Blue',
-    price: '$32.00',
-    quantity: 1,
-    imageSrc:
-      'https://tailwindui.com/img/ecommerce-images/shopping-cart-page-04-product-02.jpg',
-    imageAlt:
-      'Front of satchel with blue canvas body, black straps and handle, drawstring top, and front zipper pouch.',
-  },
-  // More products...
-];
+import { cartActions, selectAllCartItems } from './cartSlice';
+import { useSelector, useDispatch } from 'react-redux';
 
 export default function Cart({ btn }) {
-  const [open, setOpen] = useState(true);
+  let total = 0;
+  const products = useSelector(selectAllCartItems);
+  const totalPrice = useSelector((state) => state.cart.totalPrice);
+  const dispatch = useDispatch();
+  console.log(products);
+
+  const handleRemoveFromCart = (id) => {
+    dispatch(cartActions.removeFromCart(id));
+  };
+
+  const handleAddToCart = (product) => {
+    dispatch(cartActions.addToCart(product));
+    console.log('Added to cart');
+  };
+
+  const delItemFromCart = (id) => {
+    dispatch(cartActions.deleteItemFromCart(id));
+  };
+
+  products.forEach((item) => {
+    total += item.totalPrice;
+  });
+
+  useEffect(() => {
+    dispatch(cartActions.setTotalPrice({ totalPrice: total }));
+  }, [total]);
 
   return (
     <div className="mx-auto my-3 bg-white max-w-7xl px-4 sm:px-6 lg:px-8 border-gray-300 border-2">
@@ -42,69 +41,76 @@ export default function Cart({ btn }) {
         </h1>
         <div className="flow-root">
           <ul role="list" className="-my-6 divide-y divide-gray-200 px-5 py-5">
-            {products.map((product) => (
-              <li key={product.id} className="flex py-6">
-                <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                  <img
-                    src={product.imageSrc}
-                    alt={product.imageAlt}
-                    className="h-full w-full object-cover object-center"
-                  />
-                </div>
-
-                <div className="ml-4 flex flex-1 flex-col">
-                  <div>
-                    <div className="flex justify-between text-base font-medium text-gray-900">
-                      <h3>
-                        <a href={product.href}>{product.name}</a>
-                      </h3>
-                      <p className="ml-4">{product.price}</p>
-                    </div>
-                    <p className="mt-1 text-sm text-gray-500">
-                      {product.color}
-                    </p>
+            {products.length ? (
+              products.map((product) => (
+                <li key={product.id} className="flex py-6">
+                  <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
+                    <img
+                      src={product.image}
+                      alt={product.title}
+                      className="h-full w-full object-cover object-center"
+                    />
                   </div>
-                  <div className="flex flex-1 items-end justify-between text-sm">
-                    <div className="text-gray-500">
-                      Qty{' '}
-                      <select className="border-2">
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                      </select>
-                    </div>
 
-                    <div className="flex">
-                      <button
-                        type="button"
-                        className="font-medium text-indigo-600 hover:text-indigo-500"
-                      >
-                        Remove
-                      </button>
+                  <div className="ml-4 flex flex-1 flex-col">
+                    <div>
+                      <div className="flex justify-between text-base font-medium text-gray-900">
+                        <h3>{product.title}</h3>
+                        <p className="ml-4">${product.price}</p>
+                      </div>
+                    </div>
+                    <div className="flex flex-1 items-end justify-between text-sm">
+                      <div className="text-gray-500 text-md">
+                        Quantity : {product.quantity}
+                        <div className="flex gap-2 mt-1">
+                          <img
+                            onClick={() => handleRemoveFromCart(product.id)}
+                            className="cursor-pointer hover:opacity-85"
+                            src="/minus.png"
+                            width={25}
+                            alt=""
+                          />
+                          <img
+                            onClick={() => handleAddToCart(product)}
+                            className="cursor-pointer hover:opacity-85"
+                            src="/plus.png"
+                            width={27}
+                            alt=""
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex">
+                        <button
+                          type="button"
+                          className="font-medium text-indigo-600 hover:text-indigo-500"
+                          onClick={() => delItemFromCart(product.id)}
+                        >
+                          Remove
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </li>
-            ))}
+                </li>
+              ))
+            ) : (
+              <p className='text-center text-xl p-4'>No items in cart</p>
+            )}
           </ul>
         </div>
       </div>
 
       <div className="border-t border-gray-200 px-4 py-6 sm:px-6">
         <div className="flex justify-between text-base font-medium text-gray-900">
-          <p>Subtotal</p>
-          <p>$262.00</p>
+          <p>Total Price</p>
+          <p>${totalPrice}</p>
         </div>
-        <p className="mt-0.5 text-sm text-gray-500">
-          Shipping and taxes calculated at checkout.
-        </p>
         <div className="mt-6">
           <Link
-            to={btn.includes("Order")? '/payments':'/checkout'}
+            to={'/'}
             className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
           >
-            {btn}
+            Place Order & Pay
           </Link>
         </div>
       </div>

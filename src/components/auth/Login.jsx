@@ -20,8 +20,8 @@ const Login = ({ setProgress }) => {
     navigate('/');
   };
   useEffect(() => {
-    setProgress(60);
     if (user) {
+      setProgress(60);
       localStorage.setItem('login_token', user.token);
       toast.success("User logged in!")
       setProgress(100);

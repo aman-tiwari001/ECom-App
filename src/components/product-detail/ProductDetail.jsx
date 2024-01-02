@@ -1,16 +1,15 @@
 import { useEffect, useState } from 'react';
-import {
-  StarIcon,
-  ArrowRightIcon,
-  ArrowLeftIcon,
-} from '@heroicons/react/20/solid';
+import { StarIcon } from '@heroicons/react/20/solid';
 import { getSingleProduct } from './productDetailApi';
+import { useDispatch } from 'react-redux';
+import { cartActions } from '../cart/cartSlice';
+import toast from 'react-hot-toast';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
 
-export default function ProductDetail({setProgress}) {
+export default function ProductDetail({ setProgress }) {
   const [product, setProduct] = useState(null);
   const [currImgIdx, setCurrentImgIdx] = useState(0);
 
@@ -27,6 +26,13 @@ export default function ProductDetail({setProgress}) {
     } else {
       setCurrentImgIdx(currImgIdx - 1);
     }
+  };
+
+  const dispatch = useDispatch();
+
+  const handleAddToCart = (product) => {
+    dispatch(cartActions.addToCart(product));
+    toast.success('Added to cart');
   };
 
   useEffect(() => {
@@ -122,7 +128,10 @@ export default function ProductDetail({setProgress}) {
               </div>
 
               <div className="mt-20">
-                <button className="mt-10 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                <button
+                  onClick={() => handleAddToCart(product)}
+                  className="mt-10 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                >
                   Add to Cart
                 </button>
               </div>

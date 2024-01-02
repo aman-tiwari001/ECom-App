@@ -8,8 +8,8 @@ import {
 import { Link } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
-import { logoutUserAsync } from '../auth/authSlice';
-import { useDispatch } from 'react-redux';
+import { logoutUser } from '../auth/authSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 const navigation = [
   { name: 'Home', href: '/', current: true },
@@ -27,9 +27,10 @@ export default function NavBar() {
   const [user, SetUser] = useState({});
 
   const dispatch = useDispatch();
+  const totalCartItems = useSelector((state) => state.cart.totalQuantity);
 
   const handleLogout = () => {
-    dispatch(logoutUserAsync);
+    dispatch(logoutUser);
     localStorage.removeItem('login_token');
     navigate('/login');
   };
@@ -101,7 +102,7 @@ export default function NavBar() {
                     <span className="absolute -inset-1.5" />
                     <span className="sr-only">View notifications</span>
                     <span className="inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-800 ring-1 ring-inset ring-yellow-600/20">
-                      7
+                      {totalCartItems}
                     </span>
                     <ShoppingCartIcon className="h-6 w-6" aria-hidden="true" />
                   </button>
@@ -155,8 +156,6 @@ export default function NavBar() {
               {navigation.map((item) => (
                 <Disclosure.Button
                   key={item.name}
-                  as="a"
-                  href={item.href}
                   className={classNames(
                     item.current
                       ? 'bg-gray-900 text-white'
@@ -165,7 +164,7 @@ export default function NavBar() {
                   )}
                   aria-current={item.current ? 'page' : undefined}
                 >
-                  {item.name}
+                  <Link to={item.href}>{item.name}</Link>
                 </Disclosure.Button>
               ))}
             </div>

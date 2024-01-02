@@ -1,9 +1,23 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { jwtDecode } from 'jwt-decode';
 
 import { loginUser } from './authApi';
 
+const token = localStorage.getItem('login_token');
+let decodedUser = null;
+
+try {
+  if (token) { // decoding the token to get user payload
+    decodedUser = jwtDecode(token);
+  }
+} catch (error) {
+  // decoding error or invalid token
+  console.error('Error decoding or processing token:', error);
+  decodedUser = null;
+}
+
 const initialState = {
-  user: null,
+  user: decodedUser,
   status: 'idle',
 };
 
@@ -15,16 +29,14 @@ export const loginUserAsync = createAsyncThunk(
   }
 );
 
-export const logoutUserAsync = createAsyncThunk(
-  'auth/logoutUser',
-  async () => {
-    return null;
-  }
-);
-
 export const authSlice = createSlice({
   name: 'auth',
   initialState,
+  reducers: {
+    logoutUser: (state) => {
+      state.user = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(loginUserAsync.pending, (state) => {
@@ -33,13 +45,6 @@ export const authSlice = createSlice({
       .addCase(loginUserAsync.fulfilled, (state, action) => {
         state.status = 'idle';
         state.user = action.payload;
-      })
-      .addCase(logoutUserAsync.pending, (state) => {
-        state.status = 'loading';
-      })
-      .addCase(logoutUserAsync.fulfilled, (state, action) => {
-        state.status = 'idle';
-        state.user = null;
       });
   },
 });
@@ -48,4 +53,5 @@ export const authSlice = createSlice({
 
 export const fetchUser = (state) => state.auth.user;
 
+export const { logoutUser } = authSlice.actions;
 export default authSlice.reducer;
