@@ -16,14 +16,19 @@ const Login = ({ setProgress }) => {
 
   const handleUserLogin = async () => {
     setProgress(30);
-    await dispatch(loginUserAsync(credentials));
-    navigate('/');
+    try {
+      await dispatch(loginUserAsync(credentials));
+      navigate('/');
+    } catch (err) {
+      toast.error('Invalid credentials!');
+      navigate('/login');
+    }
   };
   useEffect(() => {
     if (user) {
       setProgress(60);
       localStorage.setItem('login_token', user.token);
-      toast.success("User logged in!")
+      toast.success('User logged in!');
       setProgress(100);
     }
   }, [user]);
@@ -109,11 +114,9 @@ const Login = ({ setProgress }) => {
           </div>
         </div>
 
-        <p className="mt-10 text-center text-sm text-gray-500">
-          Not a member?{' '}
-          <span className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
-            Create a new account
-          </span>
+        <p className="mt-10 text-center text-md text-gray-300">
+          Use <b>kminchelle</b> as username and <b>0lelplR</b> as password to
+          login!
         </p>
       </div>
     </div>

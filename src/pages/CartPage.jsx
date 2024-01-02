@@ -7,7 +7,7 @@ const CartPage = () => {
     <>
       <NavBar />
       <div className='mt-20'> 
-        <Cart btn={'Checkout'} />
+        <Cart/>
       </div>
     </>
   );

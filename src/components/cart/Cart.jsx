@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { cartActions, selectAllCartItems } from './cartSlice';
 import { useSelector, useDispatch } from 'react-redux';
 
-export default function Cart({ btn }) {
+export default function Cart() {
   let total = 0;
   const products = useSelector(selectAllCartItems);
   const totalPrice = useSelector((state) => state.cart.totalPrice);
@@ -44,13 +44,15 @@ export default function Cart({ btn }) {
             {products.length ? (
               products.map((product) => (
                 <li key={product.id} className="flex py-6">
-                  <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                    <img
-                      src={product.image}
-                      alt={product.title}
-                      className="h-full w-full object-cover object-center"
-                    />
-                  </div>
+                  <Link to={`/product-detail/${product.id}`}>
+                    <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
+                      <img
+                        src={product.image}
+                        alt={product.title}
+                        className="h-full w-full object-cover object-center"
+                      />
+                    </div>
+                  </Link>
 
                   <div className="ml-4 flex flex-1 flex-col">
                     <div>
@@ -94,7 +96,7 @@ export default function Cart({ btn }) {
                 </li>
               ))
             ) : (
-              <p className='text-center text-xl p-4'>No items in cart</p>
+              <p className="text-center text-xl p-4">No items in cart</p>
             )}
           </ul>
         </div>
