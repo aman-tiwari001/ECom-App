@@ -82,14 +82,6 @@ export default function CategoryFilter({setProgress}) {
     dispatch(fetchAllProductsAsync(e.target.value))
   };
 
-  const handleSorting = (option) => {
-    console.log(option);
-    let newSort = { ...filterObj, _sort: option.sort, _order: option.order };
-    console.log('sort Obj ', newSort);
-    dispatch(fetchAllProductsByFilterAsync(newSort));
-    setFilterObj(newSort);
-  };
-
   useEffect(() => {
     const initialFetch = async () => {
       setCatgories(await getCategories());

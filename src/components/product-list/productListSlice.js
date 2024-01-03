@@ -10,6 +10,8 @@ const initialState = {
   status: 'idle',
 };
 
+// Handling asynchronous actions in redux using async thunk
+
 export const fetchAllProductsAsync = createAsyncThunk(
   'product/fetchAllProducts',
   async (maxprice) => {

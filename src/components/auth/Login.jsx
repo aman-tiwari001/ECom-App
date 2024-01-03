@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import toast from 'react-hot-toast';
-import { fetchUser, loginUserAsync } from './authSlice';
+import { loginUserReducer } from './authSlice';
+import { loginUser } from './authApi';
 
 const Login = ({ setProgress }) => {
   const navigate = useNavigate();
@@ -12,26 +12,27 @@ const Login = ({ setProgress }) => {
     password: '',
   });
   const dispatch = useDispatch();
-  const user = useSelector(fetchUser);
 
   const handleUserLogin = async () => {
+    // toasting when field are empty
+    if (!credentials.username || !credentials.password) {
+      toast.error('Enter username and password to continue!');
+      return;
+    }
     setProgress(30);
     try {
-      await dispatch(loginUserAsync(credentials));
-      navigate('/');
-    } catch (err) {
-      toast.error('Invalid credentials!');
-      navigate('/login');
-    }
-  };
-  useEffect(() => {
-    if (user) {
-      setProgress(60);
+      // fetching user and dispatching to redux store
+      const user = await loginUser(credentials);
+      dispatch(loginUserReducer(user));
       localStorage.setItem('login_token', user.token);
+      navigate('/');
       toast.success('User logged in!');
-      setProgress(100);
+    } catch (error) {
+      toast.error(error.response.data.message);
     }
-  }, [user]);
+    setProgress(100);
+  };
+
   return (
     <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">

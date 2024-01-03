@@ -10,6 +10,8 @@ import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
 import { logoutUser } from '../auth/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import toast from 'react-hot-toast';
+import { cartActions } from '../cart/cartSlice';
 
 const navigation = [
   { name: 'Home', href: '/', current: true },
@@ -27,15 +29,31 @@ export default function NavBar() {
   const [user, SetUser] = useState({});
 
   const dispatch = useDispatch();
+
+  // selecting the total cart items and total cart price from redux store
   const totalCartItems = useSelector((state) => state.cart.totalQuantity);
+  const totalCartPrice = useSelector((state) => state.cart.totalPrice);
+  const cartItemList = useSelector((state) => state.cart.itemList);
 
   const handleLogout = () => {
-    dispatch(logoutUser);
+    dispatch(logoutUser());
     localStorage.removeItem('login_token');
     navigate('/login');
+    toast.success('User logged out!');
   };
 
+  // Setting total cart price in store for displaying it on navbar top
+  let total = 0;
+  cartItemList.forEach((item) => {
+    total += item.totalPrice;
+  });
+
   useEffect(() => {
+    dispatch(cartActions.setTotalPrice({ totalPrice: total }));
+  }, [total]);
+
+  useEffect(() => {
+    // decoding user from the stored jwt login_toke
     const token = localStorage.getItem('login_token');
     if (token) {
       const user = jwtDecode(token);
@@ -107,6 +125,7 @@ export default function NavBar() {
                     <ShoppingCartIcon className="h-6 w-6" aria-hidden="true" />
                   </button>
                 </Link>
+                <span className="text-lg text-white">${totalCartPrice}</span>
 
                 {/* Profile dropdown */}
                 <Menu as="div" className="relative ml-3">

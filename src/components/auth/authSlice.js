@@ -1,13 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { jwtDecode } from 'jwt-decode';
 
-import { loginUser } from './authApi';
-
 const token = localStorage.getItem('login_token');
 let decodedUser = null;
 
 try {
-  if (token) { // decoding the token to get user payload
+  if (token) {
+    // decoding the token to get user payload
     decodedUser = jwtDecode(token);
   }
 } catch (error) {
@@ -18,16 +17,7 @@ try {
 
 const initialState = {
   user: decodedUser,
-  status: 'idle',
 };
-
-export const loginUserAsync = createAsyncThunk(
-  'auth/loginUser',
-  async (credentials) => {
-    const response = await loginUser(credentials);
-    return response;
-  }
-);
 
 export const authSlice = createSlice({
   name: 'auth',
@@ -36,22 +26,12 @@ export const authSlice = createSlice({
     logoutUser: (state) => {
       state.user = null;
     },
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(loginUserAsync.pending, (state) => {
-        state.status = 'loading';
-      })
-      .addCase(loginUserAsync.fulfilled, (state, action) => {
-        state.status = 'idle';
-        state.user = action.payload;
-      });
+    loginUserReducer: (state, action) => {
+      state.user = action.payload;
+    },
   },
 });
 
-// Action creators are generated for each case reducer function
-
 export const fetchUser = (state) => state.auth.user;
-
-export const { logoutUser } = authSlice.actions;
+export const { logoutUser, loginUserReducer } = authSlice.actions;
 export default authSlice.reducer;

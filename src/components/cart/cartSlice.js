@@ -9,12 +9,14 @@ const cartSlice = createSlice({
   },
   reducers: {
     addToCart: (state, actions) => {
+      // action to add new item and increase quantity one by one
       const newItem = actions.payload;
+      //checking for alreday existed item in cart
       const existingItem = state.itemList.find(
         (oldItem) => oldItem.id === newItem.id
       );
       if (existingItem) {
-        //if item is alreday existing in cart
+        //if item alreday exists in cart
         existingItem.quantity++;
         existingItem.totalPrice += newItem.price;
       } else {
@@ -29,7 +31,7 @@ const cartSlice = createSlice({
         state.totalQuantity++;
       }
     },
-    removeFromCart: (state, actions) => {
+    removeFromCart: (state, actions) => { // action to reduce quantity of item one by one in cart
       const id = actions.payload;
       const itemToRemove = state.itemList.find((item) => item.id === id);
       if (itemToRemove.quantity === 1) {
@@ -41,7 +43,7 @@ const cartSlice = createSlice({
         itemToRemove.totalPrice -= itemToRemove.price;
       }
     },
-    deleteItemFromCart: (state, actions) => {
+    deleteItemFromCart: (state, actions) => { // action to completely remove item from cart
       const id = actions.payload;
       const itemToRemove = state.itemList.find((item) => item.id === id);
       state.itemList = state.itemList.filter((item) => item.id !== id);
@@ -54,6 +56,7 @@ const cartSlice = createSlice({
   },
 });
 
+// to select all the current cart items 
 export const selectAllCartItems = (state) => state.cart.itemList;
 
 export const cartActions = cartSlice.actions;

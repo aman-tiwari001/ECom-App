@@ -27,6 +27,7 @@ function App() {
             path="/login"
             element={<LoginPage setProgress={setProgress} />}
           />
+          // protected routes - only logged in users can access
           <Route element={<ProtectedRoutes setProgress={setProgress} />}>
             <Route path="/" element={<Home setProgress={setProgress} />} />
             <Route

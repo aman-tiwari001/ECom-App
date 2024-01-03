@@ -42,8 +42,9 @@ export default function Cart() {
         <div className="flow-root">
           <ul role="list" className="-my-6 divide-y divide-gray-200 px-5 py-5">
             {products.length ? (
-              products.map((product) => (
-                <li key={product.id} className="flex py-6">
+              products.map((product, idx) => (
+                <li key={product.id} className="flex py-6 items-center gap-3">
+                  <span className="text-md font-bold">{idx + 1}.</span>
                   <Link to={`/product-detail/${product.id}`}>
                     <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                       <img
@@ -56,13 +57,13 @@ export default function Cart() {
 
                   <div className="ml-4 flex flex-1 flex-col">
                     <div>
-                      <div className="flex justify-between text-base font-medium text-gray-900">
+                      <div className="flex justify-between text-md font-medium text-gray-900">
                         <h3>{product.title}</h3>
                         <p className="ml-4">${product.price}</p>
                       </div>
                     </div>
                     <div className="flex flex-1 items-end justify-between text-sm">
-                      <div className="text-gray-500 text-md">
+                      <div className="text-gray-700 text-lg">
                         Quantity : {product.quantity}
                         <div className="flex gap-2 mt-1">
                           <img
