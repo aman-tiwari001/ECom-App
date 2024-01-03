@@ -1,8 +1,6 @@
-# React + Vite
+# ECOMMERCE APP 
+This is an Ecommerce App project built using ReactJS and Redux toolkit with features like advanced product listing, add to cart, cart management, product filters category & price wise, product searching and auth based protected routes, it fetches data from Dummy JSON server.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Tech stack used - ReactJS, React-Redux, Redux Tookit, TailwindCSS, DummyJSON
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Project link - https://e-com-app-delta.vercel.app
